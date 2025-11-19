@@ -103,6 +103,17 @@ const App: React.FC = () => {
     localStorage.setItem('releafUser', JSON.stringify(updatedUser));
   };
 
+  const handleRecycle = (bottles: number, weight: number, points: number) => {
+    if (!user) return;
+    const updatedUser = {
+      ...user,
+      bottlesRecycled: user.bottlesRecycled + bottles,
+      wasteDivertedKg: user.wasteDivertedKg + weight,
+      points: user.points + points
+    };
+    handleUpdateUser(updatedUser);
+  };
+
   return (
     <HashRouter>
       <div className="min-h-screen flex flex-col font-sans antialiased bg-slate-50 dark:bg-[#0B1120] selection:bg-releaf-200 dark:selection:bg-releaf-900">
@@ -118,7 +129,13 @@ const App: React.FC = () => {
 
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Hero user={user} onOpenAuth={() => setIsAuthOpen(true)} />} />
+            <Route path="/" element={
+              <Hero 
+                user={user} 
+                onOpenAuth={() => setIsAuthOpen(true)} 
+                onRecycle={handleRecycle}
+              />
+            } />
             
             <Route 
               path="/recycle" 

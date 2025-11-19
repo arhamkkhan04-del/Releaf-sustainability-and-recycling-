@@ -70,6 +70,11 @@ export const Recycle: React.FC<RecycleProps> = ({ user, onUpdateUser }) => {
     c.items.some(i => i.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  const handleGetDirections = () => {
+    const query = encodeURIComponent(selectedCenter.address);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+  };
+
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)] bg-white dark:bg-[#0B1120]">
       
@@ -226,7 +231,10 @@ export const Recycle: React.FC<RecycleProps> = ({ user, onUpdateUser }) => {
            </div>
 
            <div className="space-y-3">
-              <button className="w-full bg-releaf-600 hover:bg-releaf-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-releaf-500/20 flex items-center justify-center gap-2">
+              <button 
+                onClick={handleGetDirections}
+                className="w-full bg-releaf-600 hover:bg-releaf-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-releaf-500/20 flex items-center justify-center gap-2"
+              >
                  <Navigation size={18} />
                  Get Directions
               </button>
