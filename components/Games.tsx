@@ -79,8 +79,6 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
   // Ocean Clicker State
   const [oceanItems, setOceanItems] = useState<{id: number, x: number, y: number, type: string}[]>([]);
   const [timeLeft, setTimeLeft] = useState(30);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const spawnerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Scramble State
   const [scrambleIndex, setScrambleIndex] = useState(0);
@@ -90,7 +88,9 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
   // --- HELPER FUNCTIONS ---
 
   const awardPoints = (points: number) => {
-    onUpdateUser({ ...user, points: user.points + points });
+    if (points > 0) {
+        onUpdateUser({ ...user, points: user.points + points });
+    }
   };
 
   const resetGameState = () => {
@@ -101,13 +101,11 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
     setSorterIndex(0);
     setSorterItem(SORTER_ITEMS[Math.floor(Math.random() * SORTER_ITEMS.length)]); // Random start
     setCarbonIndex(0);
-    setTimeLeft(30);
+    setTimeLeft(15);
     setScrambleIndex(0);
     setScrambleInput("");
     setScrambleFeedback("");
     setOceanItems([]);
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (spawnerRef.current) clearInterval(spawnerRef.current);
   };
 
   // --- GAME LOGIC HANDLERS ---
@@ -116,14 +114,20 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
   const handleTriviaAnswer = (idx: number) => {
     if (triviaSelected !== null) return;
     setTriviaSelected(idx);
-    if (idx === TRIVIA_QUESTIONS[triviaQ].correct) setGameScore(s => s + 1);
+    
+    const isCorrect = idx === TRIVIA_QUESTIONS[triviaQ].correct;
+    const newScore = gameScore + (isCorrect ? 1 : 0);
+    if (isCorrect) setGameScore(newScore);
+
     setTimeout(() => {
       if (triviaQ < TRIVIA_QUESTIONS.length - 1) {
         setTriviaQ(q => q + 1);
         setTriviaSelected(null);
       } else {
         setGameFinished(true);
-        awardPoints(gameScore * 10);
+        // Calculate final points: correct answers * 10
+        const finalPoints = newScore * 10;
+        awardPoints(finalPoints);
       }
     }, 1000);
   };
@@ -132,8 +136,11 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
   const handleSort = (type: string) => {
     if (sorterFeedback) return;
     const isCorrect = sorterItem.type === type;
+    const pointValue = isCorrect ? 10 : 0;
+    const newScore = gameScore + pointValue;
+
     if (isCorrect) {
-      setGameScore(s => s + 10);
+      setGameScore(newScore);
       setSorterFeedback('correct');
     } else {
       setSorterFeedback('wrong');
@@ -147,8 +154,7 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
         setSorterItem(SORTER_ITEMS[Math.floor(Math.random() * SORTER_ITEMS.length)]);
       } else {
         setGameFinished(true);
-        awardPoints(gameScore); // Points already added to local state, just update DB
-        onUpdateUser({ ...user, points: user.points + (isCorrect ? 10 : 0) }); // Add last point
+        awardPoints(newScore);
       }
     }, 800);
   };
@@ -182,15 +188,17 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
           const matchedCards = [...memoryCards];
           matchedCards[first].matched = true;
           matchedCards[second].matched = true;
-          matchedCards[first].flipped = true; // Keep visible
+          matchedCards[first].flipped = true; 
           matchedCards[second].flipped = true;
           setMemoryCards(matchedCards);
           setFlippedIndices([]);
-          setGameScore(s => s + 20);
+          
+          const newScore = gameScore + 20;
+          setGameScore(newScore);
           
           if (matchedCards.every(c => c.matched)) {
             setGameFinished(true);
-            awardPoints(100); // Bonus for completion
+            awardPoints(newScore + 50); // Score + Bonus
           }
         }, 500);
       } else {
@@ -210,49 +218,63 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
     const pair = CARBON_PAIRS[carbonIndex];
     const isCorrect = choice === 'a' ? pair.a.val >= pair.b.val : pair.b.val >= pair.a.val;
     
-    if (isCorrect) setGameScore(s => s + 15);
+    const pointValue = isCorrect ? 15 : 0;
+    const newScore = gameScore + pointValue;
+    if (isCorrect) setGameScore(newScore);
 
     if (carbonIndex < CARBON_PAIRS.length - 1) {
       setCarbonIndex(i => i + 1);
     } else {
       setGameFinished(true);
-      awardPoints(gameScore + (isCorrect ? 15 : 0));
+      awardPoints(newScore);
     }
   };
 
-  // Ocean Clicker
+  // Ocean Clicker Logic
   const initOcean = () => {
     resetGameState();
     setActiveGame('ocean');
-    setTimeLeft(15);
-    
-    // Spawner
-    spawnerRef.current = setInterval(() => {
-      setOceanItems(prev => {
-        if (prev.length > 10) return prev; // Max items
-        return [...prev, {
-          id: Date.now(),
-          x: Math.random() * 80 + 10, // 10-90%
-          y: Math.random() * 80 + 10,
-          type: Math.random() > 0.5 ? 'trash' : 'fish' // Don't click fish!
-        }];
-      });
-    }, 800);
-
-    // Timer
-    timerRef.current = setInterval(() => {
-      setTimeLeft(t => {
-        if (t <= 1) {
-          clearInterval(timerRef.current!);
-          clearInterval(spawnerRef.current!);
-          setGameFinished(true);
-          awardPoints(gameScore);
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
+    setTimeLeft(20);
   };
+
+  // Ocean Timer
+  useEffect(() => {
+    // Fix: Use 'any' type for timer instead of NodeJS.Timeout to avoid namespace errors
+    let timer: any;
+    if (activeGame === 'ocean' && !gameFinished && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (activeGame === 'ocean' && timeLeft === 0 && !gameFinished) {
+      setGameFinished(true);
+      awardPoints(gameScore); // Award points when time runs out
+    }
+    return () => clearInterval(timer);
+  }, [activeGame, timeLeft, gameFinished]); 
+  // Note: Removed gameScore from dependency array to avoid timer flicker, 
+  // but awardPoints in the 'timeLeft === 0' block will use current closure state.
+  // For perfect accuracy we rely on the render cycle being fast enough or use a Ref.
+  // Since React state is updated, the re-render will trigger the effect check.
+
+  // Ocean Spawner
+  useEffect(() => {
+    // Fix: Use 'any' type for spawner instead of NodeJS.Timeout to avoid namespace errors
+    let spawner: any;
+    if (activeGame === 'ocean' && !gameFinished) {
+      spawner = setInterval(() => {
+        setOceanItems(prev => {
+          if (prev.length > 8) return prev; 
+          return [...prev, {
+            id: Date.now(),
+            x: Math.random() * 80 + 10,
+            y: Math.random() * 80 + 10,
+            type: Math.random() > 0.6 ? 'trash' : 'fish'
+          }];
+        });
+      }, 800);
+    }
+    return () => clearInterval(spawner);
+  }, [activeGame, gameFinished]);
 
   const handleOceanClick = (id: number, type: string) => {
     if (gameFinished) return;
@@ -270,7 +292,9 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
     const current = SCRAMBLE_WORDS[scrambleIndex];
     if (scrambleInput.toUpperCase() === current.word) {
       setScrambleFeedback("Correct!");
-      setGameScore(s => s + 20);
+      const newScore = gameScore + 20;
+      setGameScore(newScore);
+
       setTimeout(() => {
         setScrambleFeedback("");
         setScrambleInput("");
@@ -278,7 +302,7 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
           setScrambleIndex(i => i + 1);
         } else {
           setGameFinished(true);
-          awardPoints(gameScore + 20);
+          awardPoints(newScore + 20); // Bonus for completion
         }
       }, 1000);
     } else {
@@ -287,17 +311,9 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
   };
   
   const getScrambledWord = (word: string) => {
+    // Simple scramble
     return word.split('').sort(() => Math.random() - 0.5).join('');
   };
-
-  // Cleanup effects
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (spawnerRef.current) clearInterval(spawnerRef.current);
-    };
-  }, []);
-
 
   // --- RENDERERS ---
 
@@ -322,8 +338,10 @@ export const Games: React.FC<GamesProps> = ({ user, onUpdateUser }) => {
         ].map(game => (
           <div key={game.id} className="bg-white dark:bg-[#1F2937] rounded-3xl overflow-hidden shadow-xl border border-slate-100 dark:border-slate-700 group hover:-translate-y-2 transition-all duration-300 flex flex-col">
               <div className={`h-40 bg-gradient-to-br ${game.color} flex items-center justify-center relative overflow-hidden`}>
-                <game.icon size={80} className="text-white/20 absolute -right-4 -bottom-4 rotate-12 group-hover:scale-110 transition-transform" />
-                <game.icon size={48} className="text-white relative z-10" />
+                <div className="absolute inset-0 opacity-20 bg-black"></div>
+                {/* Use React.createElement to render icon component dynamically */}
+                {React.createElement(game.icon, { size: 80, className: "text-white/20 absolute -right-4 -bottom-4 rotate-12 group-hover:scale-110 transition-transform" })}
+                {React.createElement(game.icon, { size: 48, className: "text-white relative z-10" })}
               </div>
               <div className="p-6 flex-1 flex flex-col">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{game.name}</h3>

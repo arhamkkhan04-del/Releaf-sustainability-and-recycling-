@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Recycle, Scale, Waves, MapPin, QrCode, CheckCircle, Loader2, Leaf, Wind, Globe } from 'lucide-react';
+import { ArrowRight, Scale, Waves, MapPin, QrCode, CheckCircle, Loader2, Leaf, Wind, Globe } from 'lucide-react';
 import { User } from '../types';
 
 interface HeroProps {
@@ -53,7 +53,7 @@ export const Hero: React.FC<HeroProps> = ({ user, onOpenAuth, onRecycle }) => {
           </div>
         </div>
 
-        {/* IMPACT STATS (New Section) */}
+        {/* IMPACT STATS (Requested Feature) */}
         <div>
            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
              <Globe size={20} className="text-ocean-500" />
@@ -61,37 +61,39 @@ export const Hero: React.FC<HeroProps> = ({ user, onOpenAuth, onRecycle }) => {
            </h2>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Waste Diverted */}
-              <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
-                    <Scale size={24} />
+              <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                 <div className="w-14 h-14 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 shadow-inner">
+                    <Scale size={28} />
                  </div>
                  <div>
                     <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Waste Diverted</p>
                     <p className="text-2xl font-bold text-slate-900 dark:text-white">{user.wasteDivertedKg.toFixed(1)} <span className="text-sm font-normal text-slate-400">kg</span></p>
+                    <p className="text-[10px] text-slate-400 mt-1">Kept out of landfills</p>
                  </div>
               </div>
 
               {/* Ocean Saved */}
-              <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-full bg-ocean-100 dark:bg-ocean-900/30 flex items-center justify-center text-ocean-600 dark:text-ocean-400">
-                    <Waves size={24} />
+              <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                 <div className="w-14 h-14 rounded-full bg-ocean-100 dark:bg-ocean-900/30 flex items-center justify-center text-ocean-600 dark:text-ocean-400 shadow-inner">
+                    <Waves size={28} />
                  </div>
                  <div>
                     <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Ocean Rescue</p>
                     <p className="text-2xl font-bold text-slate-900 dark:text-white">{user.bottlesRecycled} <span className="text-sm font-normal text-slate-400">items</span></p>
-                    <p className="text-[10px] text-green-500">Saved from waterways</p>
+                    <p className="text-[10px] text-green-500 font-medium mt-1">Prevented ocean pollution</p>
                  </div>
               </div>
 
               {/* CO2 Offset */}
-              <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
-                    <Wind size={24} />
+              <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                 <div className="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 shadow-inner">
+                    <Wind size={28} />
                  </div>
                  <div>
                     <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">CO₂ Reduced</p>
-                    {/* Approx calculation: 1kg plastic = ~1.5kg CO2e saved by recycling vs virgin production */}
+                    {/* Approx calculation: 1kg plastic = ~1.5kg CO2e saved */}
                     <p className="text-2xl font-bold text-slate-900 dark:text-white">{(user.wasteDivertedKg * 1.5).toFixed(1)} <span className="text-sm font-normal text-slate-400">kg</span></p>
+                    <p className="text-[10px] text-slate-400 mt-1">Carbon footprint offset</p>
                  </div>
               </div>
            </div>
@@ -149,7 +151,7 @@ export const Hero: React.FC<HeroProps> = ({ user, onOpenAuth, onRecycle }) => {
          {/* Background Image with Overlay */}
          <div className="absolute inset-0 z-0">
            <img 
-             src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=2000" 
+             src="https://images.unsplash.com/photo-1621451537084-482c73073a0f?auto=format&fit=crop&q=80&w=2000" 
              alt="Ocean Plastic" 
              className="w-full h-full object-cover opacity-40"
            />
@@ -195,7 +197,7 @@ export const Hero: React.FC<HeroProps> = ({ user, onOpenAuth, onRecycle }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-               <div className="p-6 rounded-3xl bg-ocean-50 dark:bg-ocean-900/10 border border-ocean-100 dark:border-ocean-800 text-center">
+               <div className="p-6 rounded-3xl bg-ocean-50 dark:bg-ocean-900/10 border border-ocean-100 dark:border-ocean-800 text-center hover:-translate-y-1 transition-transform duration-300">
                   <div className="w-16 h-16 mx-auto bg-ocean-100 dark:bg-ocean-800 rounded-full flex items-center justify-center text-ocean-600 dark:text-ocean-400 mb-4">
                      <Waves size={32} />
                   </div>
@@ -203,7 +205,7 @@ export const Hero: React.FC<HeroProps> = ({ user, onOpenAuth, onRecycle }) => {
                   <p className="text-slate-500 dark:text-slate-400 font-medium">Bottles Saved from Oceans</p>
                </div>
                
-               <div className="p-6 rounded-3xl bg-releaf-50 dark:bg-releaf-900/10 border border-releaf-100 dark:border-releaf-800 text-center">
+               <div className="p-6 rounded-3xl bg-releaf-50 dark:bg-releaf-900/10 border border-releaf-100 dark:border-releaf-800 text-center hover:-translate-y-1 transition-transform duration-300">
                   <div className="w-16 h-16 mx-auto bg-releaf-100 dark:bg-releaf-800 rounded-full flex items-center justify-center text-releaf-600 dark:text-releaf-400 mb-4">
                      <Scale size={32} />
                   </div>
@@ -211,7 +213,7 @@ export const Hero: React.FC<HeroProps> = ({ user, onOpenAuth, onRecycle }) => {
                   <p className="text-slate-500 dark:text-slate-400 font-medium">Waste Diverted from Landfills</p>
                </div>
 
-               <div className="p-6 rounded-3xl bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-800 text-center">
+               <div className="p-6 rounded-3xl bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-800 text-center hover:-translate-y-1 transition-transform duration-300">
                   <div className="w-16 h-16 mx-auto bg-yellow-100 dark:bg-yellow-800 rounded-full flex items-center justify-center text-yellow-600 dark:text-yellow-400 mb-4">
                      <Globe size={32} />
                   </div>
