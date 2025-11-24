@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, LogOut, User as UserIcon, Map as MapIcon, Home, ShoppingBag, FileText, Gamepad2, Trophy, MessageCircle, Leaf } from 'lucide-react';
+import { Moon, Sun, LogOut, User as UserIcon, Map as MapIcon, Home, ShoppingBag, FileText, Gamepad2, Trophy, MessageCircle } from 'lucide-react';
 import { User } from '../types';
+import { Logo } from './Logo';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -28,8 +29,8 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme, user, onL
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-             <Leaf className="text-releaf-500" size={24} />
+          <Link to="/" className="flex items-center gap-2 group">
+             <Logo size={28} className="group-hover:scale-110 transition-transform duration-300" />
              <span className="text-xl font-bold text-slate-900 dark:text-white">Releaf</span>
           </Link>
 

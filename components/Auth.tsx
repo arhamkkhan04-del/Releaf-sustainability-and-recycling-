@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Leaf } from 'lucide-react';
+import { X } from 'lucide-react';
 import { AuthState } from '../types';
+import { Logo } from './Logo';
 
 interface AuthProps {
   isOpen: boolean;
@@ -44,7 +45,7 @@ export const Auth: React.FC<AuthProps> = ({ isOpen, onClose, onLogin }) => {
         <div className="p-8 pt-10">
           <div className="flex flex-col items-center mb-8">
              <div className="flex items-center gap-2 mb-6">
-                <Leaf className="text-releaf-500" size={32} />
+                <Logo size={40} />
                 <span className="text-3xl font-bold text-white">Releaf</span>
              </div>
              <h2 className="text-xl font-semibold text-white mb-1">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Scale, Waves, MapPin, QrCode, CheckCircle, Loader2, Leaf, Wind, Globe } from 'lucide-react';
 import { User } from '../types';
+import { Logo } from './Logo';
 
 interface HeroProps {
   user: User | null;
@@ -32,8 +33,8 @@ export const Hero: React.FC<HeroProps> = ({ user, onOpenAuth, onRecycle }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-[float_0.3s_ease-out]">
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-releaf-600 to-emerald-700 rounded-3xl p-8 sm:p-10 shadow-xl text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 opacity-10 pointer-events-none">
-             <Leaf size={300} />
+          <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+             <Logo size={400} />
           </div>
           <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-6">
             <div>
